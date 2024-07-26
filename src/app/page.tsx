@@ -4,9 +4,8 @@ import { invoke } from "@tauri-apps/api/tauri";
 import { useState } from "react";
 
 export default function Home() {
-  const [msg, setmsg] = useState("");
+  const [response, setResponse] = useState("");
   const [url, seturl] = useState("");
-  const [count, setCount] = useState<number>(0);
   return (
     <main className="flex min-h-screen flex-col items-center space-y-10 p-24">
       This is Curled Serpent
@@ -16,31 +15,34 @@ export default function Home() {
           value={url}
           className="text-black w-[90vw] px-2 py-1"
           onChange={(e) => seturl(e.target.value)}
+          onKeyDown={(e) => pressedCtrlEnter(e) && callCURL(url, setResponse)}
           placeholder="URL"
         >
         </input>
         <button
-          onClick={async () => {
-            setCount(count + 1);
-            let res: string = await invoke("get_request", {
-              url,
-            });
-            setmsg(format(res));
-          }}
+          onClick={() => callCURL(url, setResponse)}
           className="border border-white px-4 py-2"
         >
           Send
         </button>
       </div>
       <pre className="h-[30vh] w-[90vw] px-5 py-2 border border-white scroll-m-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-corner-black  scrollbar-track-grey-700 ">
-        {msg}
+        {response}
       </pre>
 
-      <button onClick={() => setmsg("")}>Clear</button>
+      <button onClick={() => setResponse("")}>Clear</button>
     </main>
   );
 }
-function format(html: string) {
+async function callCURL(url: string, setResponse: Function) {
+  let res: string = await invoke("get_request", {
+    url,
+  });
+  let formatedHTML = formatHTML(res);
+  setResponse(formatedHTML);
+}
+//Formats and returns HTML string.Ignores if anything else
+function formatHTML(html: string) {
   var tab = "\t";
   var result = "";
   var indent = "";
@@ -58,4 +60,10 @@ function format(html: string) {
   });
 
   return result.substring(1, result.length - 3);
+}
+function pressedCtrlEnter(e: any) {
+  if (e.keyCode === 13 && e.ctrlKey) {
+    return true;
+  }
+  return false;
 }
