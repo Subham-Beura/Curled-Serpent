@@ -28,9 +28,26 @@ fn post_request(url: &str, data: &str) -> String {
     return res;
 }
 
+#[tauri::command]
+fn put_request(url: &str, data: &str) -> String {
+    println!("PUT {} Data: {}", url, data);
+    let output = Command::new("curl")
+        .args(["-X", "PUT"])
+        .args(["-H", "Content-Type:application/json"])
+        .args(["-d", &format!("{}", data)])
+        .arg(url)
+        .output()
+        .expect("Failed to execute command");
+    let res: String = String::from_utf8_lossy(&output.stdout).to_string();
+    return res;
+}
 fn main() {
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![get_request, post_request])
+        .invoke_handler(tauri::generate_handler![
+            get_request,
+            post_request,
+            put_request
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
