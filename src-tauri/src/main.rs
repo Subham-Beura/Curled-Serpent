@@ -4,9 +4,12 @@
 use std::process::Command;
 
 #[tauri::command]
-fn get_request(url: &str) -> String {
-    println!("GET {}", url);
+fn get_request(url: &str, data: &str) -> String {
+    println!("GET {} Data: {}", url, data);
     let output = Command::new("curl")
+        .args(["-X", "GET"])
+        .args(["-H", "Content-Type:application/json"])
+        .args(["-d", &format!("{}", data)])
         .arg(url)
         .output()
         .expect("Failed to execute command");
