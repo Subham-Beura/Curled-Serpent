@@ -44,12 +44,26 @@ fn put_request(url: &str, data: &str) -> String {
     let res: String = String::from_utf8_lossy(&output.stdout).to_string();
     return res;
 }
+#[tauri::command]
+fn delete_request(url: &str, data: &str) -> String {
+    println!("DELETE {} Data: {}", url, data);
+    let output = Command::new("curl")
+        .args(["-X", "DELETE"])
+        .args(["-H", "Content-Type:application/json"])
+        .args(["-d", &format!("{}", data)])
+        .arg(url)
+        .output()
+        .expect("Failed to execute command");
+    let res: String = String::from_utf8_lossy(&output.stdout).to_string();
+    return res;
+}
 fn main() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             get_request,
             post_request,
-            put_request
+            put_request,
+            delete_request
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
