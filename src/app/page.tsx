@@ -1,5 +1,16 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { invoke } from "@tauri-apps/api/tauri";
 import { useState } from "react";
 
@@ -11,31 +22,38 @@ export default function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center space-y-10 py-14">
       <div className="flex w-[97vw] space-x-5 mx-5">
-        <select
-          className="border border-white px-1 py-2 text-black rounded-none bg-black"
+        <Select
           value={method}
-          onChange={(e) => setMethod(e.target.value)}
+          onValueChange={(value) => setMethod(value)}
         >
-          <option value={"get_request"}>GET</option>
-          <option value={"post_request"}>POST</option>
-          <option value={"put_request"}>PUT</option>
-          <option value={"delete_request"}>DELETE</option>
-        </select>
-        <input
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="GET" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>HTTP Requests</SelectLabel>
+              <SelectItem value={"get_request"}>GET</SelectItem>
+              <SelectItem value={"post_request"}>POST</SelectItem>
+              <SelectItem value={"put_request"}>PUT</SelectItem>
+              <SelectItem value={"delete_request"}>DELETE</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+        <Input
           type="text"
           value={url}
           className="text-black w-[90vw] px-2 py-1"
-          onChange={(e) => seturl(e.target.value)}
+          onChange={e=>seturl(e.target.value)}
           onKeyDown={(e) =>
             pressedCtrlEnter(e) && callCURL(url, method, input, setResponse)}
           placeholder="URL"
         />
-        <button
+        <Button
           onClick={() => callCURL(url, method, input, setResponse)}
           className="border border-white px-4 py-2"
         >
           Send
-        </button>
+        </Button>
       </div>
       <input
         type="text"
