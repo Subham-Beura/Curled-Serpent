@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import { invoke } from "@tauri-apps/api/tauri";
+
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -11,16 +14,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { invoke } from "@tauri-apps/api/tauri";
-import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 export default function Home() {
   const [response, setResponse] = useState("");
   const [url, seturl] = useState("");
   const [method, setMethod] = useState("get_request");
-  const [input, setInput] = useState("");
+  const [body, setBody] = useState("{\n\t\n\t\n}");
   return (
-    <main className="flex min-h-screen flex-col items-center space-y-10 py-14">
+    <main
+      onKeyDown={(e) =>
+        pressedCtrlEnter(e) && callCURL(url, method, body, setResponse)}
+      className="flex min-h-screen flex-col items-center space-y-10 py-14"
+    >
       <div className="flex w-[97vw] space-x-5 mx-5">
         <Select
           value={method}
@@ -43,29 +51,48 @@ export default function Home() {
           type="text"
           value={url}
           className="text-black w-[90vw] px-2 py-1"
-          onChange={e=>seturl(e.target.value)}
+          onChange={(e) => seturl(e.target.value)}
           onKeyDown={(e) =>
-            pressedCtrlEnter(e) && callCURL(url, method, input, setResponse)}
+            pressedCtrlEnter(e) && callCURL(url, method, body, setResponse)}
           placeholder="URL"
         />
         <Button
-          onClick={() => callCURL(url, method, input, setResponse)}
+          onClick={() => callCURL(url, method, body, setResponse)}
           className="border border-white px-4 py-2"
         >
           Send
         </Button>
       </div>
-      <input
-        type="text"
-        className="h-[30vh] w-[97vw] px-3 py-2 border border-white scroll-m-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-corner-black scrollbar-track-grey-700 text-black "
-        placeholder="INPUT"
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      <pre className="h-[31vh] w-[97vw] px-3 py-2 border border-white scroll-m-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-corner-black scrollbar-track-grey-700 ">
-        {response}
-      </pre>
-      <button onClick={() => setResponse("")}>Clear</button>
+      <div>
+        <Label htmlFor="body">Body</Label>
+        <Textarea
+          className="h-[30vh] w-[97vw] px-3 py-2 border border-white scroll-m-1 overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-corner-black scrollbar-track-grey-700 text-black "
+          placeholder=""
+          value={body}
+          onChange={(e) => setBody(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Tab") e.preventDefault();
+          }}
+        >
+        </Textarea>
+      </div>
+      <div>
+        <Label htmlFor="response">Response</Label>
+
+        <pre className="h-[31vh] w-[97vw]  py-2 overflow-auto ">
+          <ScrollArea className="h-full w-full py-2 shadow-md">
+            {response}
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </pre>
+        <Button
+          variant="outline"
+          className="px-0 w-full text-left  "
+          onClick={() => setResponse("")}
+        >
+          Clear Response
+        </Button>
+      </div>
     </main>
   );
 }
@@ -87,7 +114,6 @@ function formatHTML(html: string) {
   var tab = "\t";
   var result = "";
   var indent = "";
-
   html.split(/>\s*</).forEach(function(element) {
     if (element.match(/^\/\w/)) {
       indent = indent.substring(tab.length);
