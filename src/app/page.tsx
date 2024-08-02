@@ -27,8 +27,16 @@ export default function Home() {
     <main
       onKeyDown={(e) =>
         pressedCtrlEnter(e) && callCURL(url, method, body, setResponse)}
-      className="flex min-h-screen flex-col items-center space-y-10 py-14"
+      className="flex min-h-screen flex-col items-center justify-between "
     >
+      <div className="pt-4">
+        <h1 className="scroll-m-20 text-3xl font-extrabold tracking-tight lg:text-5xl">
+          CURLED SERPENT
+        </h1>
+        <p className="text-l text-muted-foreground text-center">
+          A light-weight REST client.
+        </p>
+      </div>
       <div className="flex w-[97vw] space-x-5 mx-5">
         <Select
           value={method}
@@ -93,6 +101,14 @@ export default function Home() {
           Clear Response
         </Button>
       </div>
+      <footer>
+        {
+          //There is heart imoji in samll tag. Might not be visible
+        }
+        <small className="text-sm font-medium leading-none">
+          Made With ❤️ by Subham Beura
+        </small>
+      </footer>
     </main>
   );
 }
