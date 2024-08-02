@@ -17,9 +17,22 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+type Response = {
+  headers: any;
+  status: string;
+  body: string;
+  error?: string;
+};
+const blankResponse: Response = {
+  headers: "",
+  status: "",
+  body: "",
+};
 
 export default function Home() {
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState<Response>(blankResponse);
   const [url, seturl] = useState("");
   const [method, setMethod] = useState("get_request");
   const [body, setBody] = useState("{\n\t\n\t\n}");
@@ -87,16 +100,35 @@ export default function Home() {
       <div>
         <Label htmlFor="response">Response</Label>
 
-        <pre className="h-[31vh] w-[97vw]  py-2 overflow-auto ">
-          <ScrollArea className="h-full w-full py-2 shadow-md">
-            {response}
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </pre>
+        <Tabs defaultValue="body" className="">
+          <div className="flex items-center justify-between">
+            <TabsList>
+              <TabsTrigger value="headers">Headers</TabsTrigger>
+              <TabsTrigger value="body">Body</TabsTrigger>
+            </TabsList>
+            <h3>{response.status}</h3>
+          </div>
+          <TabsContent value="body">
+            <pre className="h-[31vh] w-[97vw]  py-2 overflow-auto ">
+              <ScrollArea className="h-full w-full py-2 shadow-md">
+                {response.body}
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </pre>
+          </TabsContent>
+          <TabsContent value="headers">
+            <pre className="h-[31vh] w-[97vw]  py-2 overflow-auto ">
+              <ScrollArea className="h-full w-full py-2 shadow-md">
+                {response.headers && JSON.stringify(response.headers, null, 3)}
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </pre>
+          </TabsContent>
+        </Tabs>
         <Button
           variant="outline"
           className="px-0 w-full text-left  "
-          onClick={() => setResponse("")}
+          onClick={() => setResponse(blankResponse)}
         >
           Clear Response
         </Button>
@@ -122,8 +154,14 @@ async function callCURL(
     url,
     data: input,
   });
-  let formatedHTML = formatHTML(res);
-  setResponse(formatedHTML);
+  let response = JSON.parse(res);
+  console.log(response);
+  if (!response.body) {
+    setResponse(response);
+    return;
+  }
+  let formatedHTML = formatHTML(response.body);
+  setResponse({ ...response, body: formatedHTML });
 }
 //Formats and returns HTML string.Ignores if anything else
 function formatHTML(html: string) {
