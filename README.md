@@ -9,7 +9,6 @@ Curled Serpent is a lightweight and fast REST API client, designed as an efficie
 - **Intuitive UI**: Clean and responsive interface designed with NextJS for a seamless user experience.
 - **Powerful Testing**: Easily send requests, view responses, and manage API endpoints.
 - **Request History**: Keep track of your API calls for easy reference and reuse.
-- **Environment Variables**: Manage different environments and variables for flexible testing.
 - **Response Visualization**: Clear and formatted display of API responses for easy analysis.
 
 
